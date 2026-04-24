@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-
 import Marquee from './components/Marquee';
 import Header from './components/Header';
 import Throne from './components/Throne';
@@ -12,7 +11,6 @@ import NewsSection from './components/NewsSection';
 import Footer from './components/Footer';
 import VoteToast from './components/VoteToast';
 
-// 🔥 FIX: central vote type (prevents TS widening everywhere)
 type VoteType = 'up' | 'down';
 
 export default function Home() {
@@ -79,12 +77,15 @@ export default function Home() {
         ytRank="#01"
         spRank="#02"
         bpRank="#01"
-        onVote={triggerToast}
+        // Throne usually expects (song, type)
+        onVote={(song, type) => triggerToast(song, type as VoteType)}
       />
 
       <div className="max-w-4xl mx-auto px-4">
 
-        <Podium onVote={triggerToast} />
+        {/* Podium usually expects (song, type) */}
+        <Podium onVote={(song, type) => triggerToast(song, type as VoteType)} />
+        
         <HotThree />
 
         <section className="mb-20">
@@ -102,7 +103,8 @@ export default function Home() {
                 yt={item.yt}
                 sp={item.sp}
                 bp={item.bp}
-                onVote={(type: VoteType) => triggerToast(item.song, type)}
+                // 🔥 FIX: Added songName and tier parameters to satisfy RankRow's type requirements
+                onVote={(songName, type, tier) => triggerToast(item.song, type as VoteType)}
               />
             ))}
           </div>
