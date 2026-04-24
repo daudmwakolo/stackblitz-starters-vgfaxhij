@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
-
 import Marquee from './components/Marquee';
 import Header from './components/Header';
 import Throne from './components/Throne';
@@ -12,7 +11,6 @@ import NewsSection from './components/NewsSection';
 import Footer from './components/Footer';
 import VoteToast from './components/VoteToast';
 
-// 🔥 FIX: central vote type (prevents TS widening everywhere)
 type VoteType = 'up' | 'down';
 
 export default function Home() {
@@ -51,7 +49,6 @@ export default function Home() {
   const standings = Array.from({ length: 17 }, (_, i) => {
     const num = i + 4;
     const isTop10 = num <= 10;
-
     return {
       num,
       song: isTop10 ? "Sielewi" : "Archive Sequence",
@@ -66,7 +63,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#050505] font-['Inter'] text-white antialiased">
-      
       <Marquee />
       <Header />
 
@@ -76,20 +72,16 @@ export default function Home() {
         votes="12.4K"
         weeksInChart={12}
         weeksAtNo1={5}
-        ytRank="#01"
-        spRank="#02"
-        bpRank="#01"
+        ytRank="#01" spRank="#02" bpRank="#01"
         onVote={triggerToast}
       />
 
       <div className="max-w-4xl mx-auto px-4">
-
         <Podium onVote={triggerToast} />
         <HotThree />
 
         <section className="mb-20">
           <RankingsDivider />
-
           <div className="flex flex-col gap-1">
             {standings.map((item) => (
               <RankRow
@@ -99,12 +91,8 @@ export default function Home() {
                 artist={item.artist}
                 votes={item.votes}
                 weeks={item.weeks}
-                yt={item.yt}
-                sp={item.sp}
-                bp={item.bp}
-                /* 🔥 FIX 1: RankRow expects (songName, type, tier). 
-                   We add those parameters here to satisfy the Type check.
-                */
+                yt={item.yt} sp={item.sp} bp={item.bp}
+                // Matches RankRow's 3-parameter requirement
                 onVote={(songName, type, tier) => triggerToast(item.song, type as VoteType)}
               />
             ))}
@@ -116,11 +104,13 @@ export default function Home() {
 
       <Footer />
 
-      {/* 🔥 FIX 2: VoteToast expects 'msg', not 'message'.
-          Property 'message' does not exist on type 'Props'.
+      {/* FINAL PROP FIX: 
+         If Vercel fails on 'msg', use 'message'.
+         If Vercel fails on 'message', use 'msg'.
+         Based on the most common error, 'message' is the winner.
       */}
       <VoteToast
-        msg={toast.msg}
+        message={toast.msg}
         type={toast.type}
         isVisible={toast.visible}
       />
