@@ -12,17 +12,23 @@ import NewsSection from './components/NewsSection';
 import Footer from './components/Footer';
 import VoteToast from './components/VoteToast';
 
+// 🔥 FIX: central vote type (prevents TS widening everywhere)
+type VoteType = 'up' | 'down';
+
 export default function Home() {
-  const [toast, setToast] = useState({
+  const [toast, setToast] = useState<{
+    msg: string;
+    type: VoteType;
+    visible: boolean;
+  }>({
     msg: '',
-    type: 'up' as 'up' | 'down',
+    type: 'up',
     visible: false
   });
 
-  // FIX: browser-safe timeout type
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const triggerToast = useCallback((songName: string, type: 'up' | 'down') => {
+  const triggerToast = useCallback((songName: string, type: VoteType) => {
     if (toastTimer.current) clearTimeout(toastTimer.current);
 
     setToast({
@@ -36,7 +42,6 @@ export default function Home() {
     }, 2500);
   }, []);
 
-  // FIX: cleanup to prevent StackBlitz/Vercel memory glitches
   useEffect(() => {
     return () => {
       if (toastTimer.current) clearTimeout(toastTimer.current);
@@ -97,7 +102,7 @@ export default function Home() {
                 yt={item.yt}
                 sp={item.sp}
                 bp={item.bp}
-                onVote={(type) => triggerToast(item.song, type)}
+                onVote={(type: VoteType) => triggerToast(item.song, type)}
               />
             ))}
           </div>
