@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+
 import Marquee from './components/Marquee';
 import Header from './components/Header';
 import Throne from './components/Throne';
@@ -11,6 +12,7 @@ import NewsSection from './components/NewsSection';
 import Footer from './components/Footer';
 import VoteToast from './components/VoteToast';
 
+// 🔥 FIX: central vote type (prevents TS widening everywhere)
 type VoteType = 'up' | 'down';
 
 export default function Home() {
@@ -77,15 +79,12 @@ export default function Home() {
         ytRank="#01"
         spRank="#02"
         bpRank="#01"
-        // Throne usually expects (song, type)
-        onVote={(song, type) => triggerToast(song, type as VoteType)}
+        onVote={triggerToast}
       />
 
       <div className="max-w-4xl mx-auto px-4">
 
-        {/* Podium usually expects (song, type) */}
-        <Podium onVote={(song, type) => triggerToast(song, type as VoteType)} />
-        
+        <Podium onVote={triggerToast} />
         <HotThree />
 
         <section className="mb-20">
@@ -103,7 +102,9 @@ export default function Home() {
                 yt={item.yt}
                 sp={item.sp}
                 bp={item.bp}
-                // 🔥 FIX: Added songName and tier parameters to satisfy RankRow's type requirements
+                /* 🔥 FIX 1: RankRow expects (songName, type, tier). 
+                   We add those parameters here to satisfy the Type check.
+                */
                 onVote={(songName, type, tier) => triggerToast(item.song, type as VoteType)}
               />
             ))}
@@ -115,8 +116,11 @@ export default function Home() {
 
       <Footer />
 
+      {/* 🔥 FIX 2: VoteToast expects 'msg', not 'message'.
+          Property 'message' does not exist on type 'Props'.
+      */}
       <VoteToast
-        message={toast.msg}
+        msg={toast.msg}
         type={toast.type}
         isVisible={toast.visible}
       />
